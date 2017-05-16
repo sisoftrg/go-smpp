@@ -15,9 +15,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/fiorix/go-smpp/smpp/pdu"
-	"github.com/fiorix/go-smpp/smpp/pdu/pdufield"
-	"github.com/fiorix/go-smpp/smpp/pdu/pdutext"
+	"github.com/sisoftrg/go-smpp/smpp/pdu"
+	"github.com/sisoftrg/go-smpp/smpp/pdu/pdufield"
+	"github.com/sisoftrg/go-smpp/smpp/pdu/pdutext"
 )
 
 // ErrMaxWindowSize is returned when an operation (such as Submit) violates
@@ -41,6 +41,7 @@ type Transmitter struct {
 	TLS                *tls.Config   // TLS client settings, optional.
 	RateLimiter        RateLimiter   // Rate limiter, optional.
 	WindowSize         uint
+	ConnInterceptor    ConnMiddleware
 	rMutex             sync.Mutex
 	r                  *rand.Rand
 
@@ -86,6 +87,7 @@ func (t *Transmitter) Bind() <-chan ConnStatus {
 		WindowSize:         t.WindowSize,
 		RateLimiter:        t.RateLimiter,
 		BindInterval:       t.BindInterval,
+		ConnInterceptor:    t.ConnInterceptor,
 	}
 	t.cl.client = c
 	c.init()
@@ -288,6 +290,7 @@ func (t *Transmitter) do(p pdu.Body) (*tx, error) {
 	t.tx.inflight[seq] = rc
 	t.tx.Unlock()
 	defer func() {
+		close(rc)
 		t.tx.Lock()
 		delete(t.tx.inflight, seq)
 		t.tx.Unlock()

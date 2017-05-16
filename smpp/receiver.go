@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fiorix/go-smpp/smpp/pdu"
-	"github.com/fiorix/go-smpp/smpp/pdu/pdufield"
+	"github.com/sisoftrg/go-smpp/smpp/pdu"
+	"github.com/sisoftrg/go-smpp/smpp/pdu/pdufield"
 )
 
 // Receiver implements an SMPP client receiver.
@@ -25,6 +25,7 @@ type Receiver struct {
 	BindInterval       time.Duration // Binding retry interval
 	TLS                *tls.Config
 	Handler            HandlerFunc
+	ConnInterceptor    ConnMiddleware
 
 	cl struct {
 		sync.Mutex
@@ -55,6 +56,7 @@ func (r *Receiver) Bind() <-chan ConnStatus {
 		Status:             make(chan ConnStatus, 1),
 		BindFunc:           r.bindFunc,
 		BindInterval:       r.BindInterval,
+		ConnInterceptor:    r.ConnInterceptor,
 	}
 	r.cl.client = c
 	c.init()

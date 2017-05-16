@@ -13,8 +13,8 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/fiorix/go-smpp/smpp/pdu"
-	"github.com/fiorix/go-smpp/smpp/pdu/pdufield"
+	"github.com/sisoftrg/go-smpp/smpp/pdu"
+	"github.com/sisoftrg/go-smpp/smpp/pdu/pdufield"
 )
 
 // ConnStatus is an abstract interface for a connection status change.
@@ -81,6 +81,11 @@ type RateLimiter interface {
 	Wait(ctx context.Context) error
 }
 
+// ConnMiddleware is useful for intercepting the traffic in/out happening
+// for the SMPP server. It should be used in a read-only way since might
+// effect the internal work of the SMPP server itself.
+type ConnMiddleware func(conn Conn) Conn
+
 // client provides a persistent client connection.
 type client struct {
 	Addr               string
@@ -93,6 +98,7 @@ type client struct {
 	BindInterval       time.Duration
 	WindowSize         uint
 	RateLimiter        RateLimiter
+	ConnInterceptor    ConnMiddleware
 
 	// internal stuff.
 	inbox chan pdu.Body
@@ -135,6 +141,9 @@ func (c *client) Bind() {
 				err: err,
 			})
 			goto retry
+		}
+		if c.ConnInterceptor != nil {
+			conn = c.ConnInterceptor(conn)
 		}
 		c.conn.Set(conn)
 		if err = c.BindFunc(c.conn); err != nil {

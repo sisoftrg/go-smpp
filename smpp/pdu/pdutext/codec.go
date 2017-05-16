@@ -9,8 +9,10 @@ type DataCoding uint8
 
 // Supported text codecs.
 const (
-	Latin1Type DataCoding = 0x03
-	UCS2Type   DataCoding = 0x08
+	Latin1Type   DataCoding = 0x03
+	ISO88595Type DataCoding = 0x06
+	UCS2Type     DataCoding = 0x08
+	SilentType   DataCoding = 0xC0
 )
 
 // Codec defines a text codec.
@@ -30,8 +32,12 @@ func Encode(typ DataCoding, text []byte) []byte {
 	switch typ {
 	case Latin1Type:
 		return Latin1(text).Encode()
+	case ISO88595Type:
+		return ISO88595(text).Encode()
 	case UCS2Type:
 		return UCS2(text).Encode()
+	case SilentType:
+		return Silent(text).Encode()
 	default:
 		return text
 	}
@@ -42,6 +48,8 @@ func Decode(typ DataCoding, text []byte) []byte {
 	switch typ {
 	case Latin1Type:
 		return Latin1(text).Decode()
+	case ISO88595Type:
+		return ISO88595(text).Decode()
 	case UCS2Type:
 		return UCS2(text).Decode()
 	default:

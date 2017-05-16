@@ -12,7 +12,7 @@ It is not fully compliant, there are some TODOs in the code.
 
 [![Build Status](https://secure.travis-ci.org/fiorix/go-smpp.png)](https://travis-ci.org/fiorix/go-smpp)
 
-[![GoDoc](https://godoc.org/github.com/fiorix/go-smpp?status.svg)](https://godoc.org/github.com/fiorix/go-smpp)
+[![GoDoc](https://godoc.org/github.com/sisoftrg/go-smpp?status.svg)](https://godoc.org/github.com/sisoftrg/go-smpp)
 
 ### Usage
 

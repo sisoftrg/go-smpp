@@ -10,8 +10,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/fiorix/go-smpp/smpp/pdu"
-	"github.com/fiorix/go-smpp/smpp/pdu/pdufield"
+	"github.com/sisoftrg/go-smpp/smpp/pdu"
+	"github.com/sisoftrg/go-smpp/smpp/pdu/pdufield"
 )
 
 // Transceiver implements an SMPP transceiver.
@@ -30,6 +30,7 @@ type Transceiver struct {
 	Handler            HandlerFunc   // Receiver handler, optional.
 	RateLimiter        RateLimiter   // Rate limiter, optional.
 	WindowSize         uint
+	ConnInterceptor    ConnMiddleware
 
 	Transmitter
 }
@@ -56,6 +57,7 @@ func (t *Transceiver) Bind() <-chan ConnStatus {
 		WindowSize:         t.WindowSize,
 		RateLimiter:        t.RateLimiter,
 		BindInterval:       t.BindInterval,
+		ConnInterceptor:    t.ConnInterceptor,
 	}
 	t.cl.client = c
 	c.init()

@@ -16,7 +16,9 @@ func TestEncode(t *testing.T) {
 		want []byte
 	}{
 		{Latin1Type, []byte("áéíóú moço"), []byte("\xe1\xe9\xed\xf3\xfa mo\xe7o")},
+		{ISO88595Type, []byte("Тест кодировки"), []byte("\xc2\xd5\xe1\xe2 \xda\xde\xd4\xd8\xe0\xde\xd2\xda\xd8")},
 		{UCS2Type, []byte("áéíóú moço"), []byte("\x00\xe1\x00\xe9\x00\xed\x00\xf3\x00\xfa\x00 \x00m\x00o\x00\xe7\x00o")},
+		{SilentType, []byte("áéíóú moço"), []byte("")},
 	}
 	for _, tc := range test {
 		have := Encode(tc.typ, tc.text)
@@ -34,7 +36,9 @@ func TestDecode(t *testing.T) {
 		text []byte
 	}{
 		{Latin1Type, []byte("áéíóú moço"), []byte("\xe1\xe9\xed\xf3\xfa mo\xe7o")},
+		{ISO88595Type, []byte("Тест кодировки"), []byte("\xc2\xd5\xe1\xe2 \xda\xde\xd4\xd8\xe0\xde\xd2\xda\xd8")},
 		{UCS2Type, []byte("áéíóú moço"), []byte("\x00\xe1\x00\xe9\x00\xed\x00\xf3\x00\xfa\x00 \x00m\x00o\x00\xe7\x00o")},
+		{SilentType, []byte("áéíóú moço"), []byte("áéíóú moço")},
 	}
 	for _, tc := range test {
 		have := Decode(tc.typ, tc.text)
