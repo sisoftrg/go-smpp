@@ -9,10 +9,20 @@ type DataCoding uint8
 
 // Supported text codecs.
 const (
-	Latin1Type   DataCoding = 0x03
-	ISO88595Type DataCoding = 0x06
-	UCS2Type     DataCoding = 0x08
-	SilentType   DataCoding = 0xC0
+	//	DefaultType   DataCoding = 0x00 // SMSC Default Alphabet
+	//	IA5Type       DataCoding = 0x01 // IA5 (CCITT T.50)/ASCII (ANSI X3.4)
+	//	BinaryType    DataCoding = 0x02 // Octet unspecified (8-bit binary)
+	Latin1Type DataCoding = 0x03 // Latin 1 (ISO-8859-1)
+	//	Binary2Type   DataCoding = 0x04 // Octet unspecified (8-bit binary)
+	//	JISType       DataCoding = 0x05 // JIS (X 0208-1990)
+	ISO88595Type DataCoding = 0x06 // Cyrillic (ISO-8859-5)
+	//	ISO88598Type  DataCoding = 0x07 // Latin/Hebrew (ISO-8859-8)
+	UCS2Type DataCoding = 0x08 // UCS2 (ISO/IEC-10646)
+	//	PictogramType DataCoding = 0x09 // Pictogram Encoding
+	//	ISO2022JPType DataCoding = 0x0A // ISO-2022-JP (Music Codes)
+	//	EXTJISType    DataCoding = 0x0D // Extended Kanji JIS (X 0212-1990)
+	//	KSC5601Type   DataCoding = 0x0E // KS C 5601
+	SilentType DataCoding = 0xC0
 )
 
 // Codec defines a text codec.
