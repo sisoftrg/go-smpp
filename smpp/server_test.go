@@ -25,7 +25,7 @@ var (
 	port       = 0 // any port
 )
 
-func BindTransceiverHandler(s Session, m pdu.Body) error {
+func BindTransceiverHandler(s Session, m pdu.Body, a string) error {
 	f := m.Fields()
 	user := f[pdufield.SystemID]
 	passwd := f[pdufield.Password]

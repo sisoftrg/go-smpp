@@ -12,6 +12,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"strings"
 	"sync"
 	"time"
 
@@ -33,7 +34,7 @@ type RequestHandlerFunc func(Session, pdu.Body)
 
 // AuthRequestHandlerFunc is the signature of a function passed to Server instances,
 // that is called when a client is trying to bind to the server.
-type AuthRequestHandlerFunc func(Session, pdu.Body) error
+type AuthRequestHandlerFunc func(Session, pdu.Body, string) error
 
 type Server interface {
 	Addr() string
@@ -254,15 +255,16 @@ func (srv *server) auth(c *conn, s Session) error {
 
 	// Read the bind PDU and if there are any handlers set, use them,
 	// if not perform the default auth
+	addr := strings.SplitN(c.rwc.RemoteAddr().String(), ":", 2)
 	if h, ok := srv.a[p.Header().ID]; ok {
-		return h(s, p)
+		return h(s, p, addr[0])
 	}
 
-	return srv.defaultAuth(s, p)
+	return srv.defaultAuth(s, p, addr[0])
 }
 
 // auth authenticate new clients.
-func (srv *server) defaultAuth(s Session, p pdu.Body) error {
+func (srv *server) defaultAuth(s Session, p pdu.Body, a string) error {
 	var resp pdu.Body
 	switch p.Header().ID {
 	case pdu.BindTransmitterID:
