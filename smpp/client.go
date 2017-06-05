@@ -5,13 +5,12 @@
 package smpp
 
 import (
+	"context"
 	"crypto/tls"
 	"io"
 	"math"
 	"sync"
 	"time"
-
-	"golang.org/x/net/context"
 
 	"github.com/sisoftrg/go-smpp/smpp/pdu"
 	"github.com/sisoftrg/go-smpp/smpp/pdu/pdufield"
