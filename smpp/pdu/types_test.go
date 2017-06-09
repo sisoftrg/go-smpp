@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/sisoftrg/go-smpp/smpp/pdu/pdufield"
+	"github.com/sisoftrg/go-smpp/smpp/pdu/pdutext"
 )
 
 func TestBind(t *testing.T) {
@@ -82,3 +83,72 @@ func TestBindResp(t *testing.T) {
 	t.Log(tx)
 }
 */
+
+func TestDeliverSM(t *testing.T) {
+	tx := []byte{
+		0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x05,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+		0x00, 0x00, 0x00, 0x31, 0x32, 0x33, 0x00, 0x00,
+		0x00, 0x34, 0x35, 0x36, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x04, 0x74,
+		0x65, 0x73, 0x74, 0x00, 0x1e, 0x00, 0x07, 0x4d,
+		0x53, 0x47, 0x5f, 0x49, 0x44, 0x00,
+	}
+	pdu := NewDeliverSM()
+	pdu.Header().Seq = 1
+	f := pdu.Fields()
+	f.Set(pdufield.SourceAddr, "123")
+	f.Set(pdufield.DestinationAddr, "456")
+	f.Set(pdufield.ShortMessage, pdutext.Latin1("test"))
+	tlv := pdu.TLVFields()
+	tlv.Set(pdufield.ReceiptedMessageID, "MSG_ID")
+
+	var b bytes.Buffer
+	if err := pdu.SerializeTo(&b); err != nil {
+		t.Fatal(err)
+	}
+	l := uint32(b.Len())
+	if l != pdu.Header().Len {
+		t.Errorf("unexpected len: want %d, have %d", l, pdu.Header().Len)
+	}
+	if !bytes.Equal(tx, b.Bytes()) {
+		t.Fatalf("unexpected bytes:\nwant:\n%s\nhave:\n%s", hex.Dump(tx), hex.Dump(b.Bytes()))
+	}
+	pdu, err := Decode(&b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	h := pdu.Header()
+	if h.ID != DeliverSMID {
+		t.Fatalf("unexpected ID: want %d, have %d", DeliverSMID, h.ID)
+	}
+	if h.Seq != 1 {
+		t.Fatalf("unexpected Seq: want 1, have %d", h.Seq)
+	}
+	test := []struct {
+		n pdufield.Name
+		v string
+	}{
+		{pdufield.SourceAddr, "123"},
+		{pdufield.DestinationAddr, "456"},
+		{pdufield.ShortMessage, "test"},
+	}
+	for _, el := range test {
+		f := pdu.Fields()[el.n]
+		if f == nil {
+			t.Fatalf("missing field: %s", el.n)
+		}
+		if f.String() != el.v {
+			t.Fatalf("unexpected value for %q: want %q, have %q", el.n, el.v, f.String())
+		}
+	}
+	tl := pdu.TLVFields()
+	if tv, ok := tl[pdufield.ReceiptedMessageID]; ok {
+		if tv.String() != "MSG_ID" {
+			t.Fatalf("unexpected value for tlv tag: want 'MSG_ID', have %q", tv.String())
+		}
+	} else {
+		t.Fatalf("missing tlv field: ReceiptedMessageID")
+	}
+
+}

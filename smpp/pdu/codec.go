@@ -96,6 +96,11 @@ func (pdu *codec) SerializeTo(w io.Writer) error {
 			return err
 		}
 	}
+	for _, t := range pdu.TLVFields() {
+		if err := t.SerializeTo(&b); err != nil {
+			return err
+		}
+	}
 	pdu.h.Len = uint32(pdu.Len())
 	err := pdu.h.SerializeTo(w)
 	if err != nil {

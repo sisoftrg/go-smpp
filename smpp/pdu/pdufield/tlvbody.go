@@ -66,9 +66,35 @@ type TLVBody struct {
 	data []byte
 }
 
+// Make new TLVBody
+func NewTLV(t TLVType, data []byte) *TLVBody {
+	if data == nil {
+		data = []byte{}
+	}
+	return &TLVBody{
+		Tag:  t,
+		Len:  uint16(len(data)),
+		data: data,
+	}
+}
+
 // Bytes return raw TLV binary data.
 func (tlv *TLVBody) Bytes() []byte {
 	return tlv.data
+}
+
+// Bytes return TLV binary data as string.
+func (tlv *TLVBody) String() string {
+	if tlv.Len > 0 && tlv.data[tlv.Len-1] == 0 {
+		return string(tlv.data[:tlv.Len-1])
+	}
+	return string(tlv.data)
+}
+
+// Set content of TLV tag
+func (tlv *TLVBody) Set(data []byte) {
+	tlv.Len = uint16(len(data))
+	tlv.data = data
 }
 
 // SerializeTo serializes TLV data to its binary form.

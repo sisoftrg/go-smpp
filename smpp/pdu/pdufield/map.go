@@ -53,3 +53,22 @@ func (m Map) Set(k Name, v interface{}) error {
 
 // TLVMap is a collection of PDU TLV field data indexed by type.
 type TLVMap map[TLVType]*TLVBody
+
+// Update TLV PDU map
+func (m TLVMap) Set(t TLVType, v interface{}) error {
+	switch v.(type) {
+	case nil:
+		m[t] = NewTLV(t, nil)
+	case uint8:
+		m[t] = NewTLV(t, []byte{v.(uint8)})
+	case int:
+		m[t] = NewTLV(t, []byte{uint8(v.(int))})
+	case string:
+		m[t] = NewTLV(t, append([]byte(v.(string)), 0)) // append NUL for string termination
+	case []byte:
+		m[t] = NewTLV(t, []byte(v.([]byte)))
+	default:
+		return fmt.Errorf("unsupported field data: %#v", v)
+	}
+	return nil
+}
