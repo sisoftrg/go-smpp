@@ -79,6 +79,14 @@ func (pdu *codec) TLVFields() pdufield.TLVMap {
 func (pdu *codec) SerializeTo(w io.Writer) error {
 	var b bytes.Buffer
 	for _, k := range pdu.FieldList() {
+		if k == pdufield.UDHLength {
+			mask := byte(1 << 6)
+			ec, ok := pdu.f[pdufield.ESMClass]
+			if !ok || ec.Raw().(byte)&mask != mask {
+				continue
+			}
+		}
+
 		f, ok := pdu.f[k]
 		if !ok {
 			pdu.f.Set(k, nil)
