@@ -42,7 +42,7 @@ type Server interface {
 	Handle(id pdu.ID, h RequestHandlerFunc)
 	HandleAuth(id pdu.ID, h AuthRequestHandlerFunc)
 	Start()
-	Serve()
+	Serve() error
 	Session(id string) Session
 }
 
@@ -188,12 +188,11 @@ func (srv *server) Session(id string) Session {
 
 // Serve accepts new clients and handle them by authenticating the
 // first PDU, expected to be a Bind PDU, then echoing all other PDUs.
-func (srv *server) Serve() {
+func (srv *server) Serve() error {
 	for {
 		cli, err := srv.l.Accept()
 		if err != nil {
-			log.Println("Closing server:", err)
-			break // on srv.l.Close
+			return err
 		}
 		go srv.handle(newConn(cli))
 	}
@@ -217,7 +216,6 @@ func (srv *server) handle(c *conn) {
 	}()
 
 	if err := srv.auth(c, s); err != nil {
-		log.Println("Server auth failed:", err)
 		return
 	}
 
