@@ -23,7 +23,7 @@ import (
 // Default settings.
 var (
 	DefaultSystemID = "sys_id"
-	IDLen           = 16
+	IDLen           = 10
 )
 
 const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
