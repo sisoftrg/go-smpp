@@ -28,6 +28,8 @@ var (
 
 const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
 
+const DisconnectID pdu.ID = 0
+
 // RequestHandlerFunc is the signature of a function passed to Server instances,
 // that is called when client PDU messages arrive.
 type RequestHandlerFunc func(Session, pdu.Body)
@@ -230,6 +232,11 @@ func (srv *server) handle(c *conn) {
 		if err != nil {
 			if err != io.EOF {
 				log.Println("Read failed:", err)
+			} else {
+				h, ok := srv.m[DisconnectID]
+				if ok {
+					h(s, nil)
+				}
 			}
 			break
 		}
