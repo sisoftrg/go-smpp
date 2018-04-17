@@ -123,11 +123,14 @@ func (t *Transmitter) handlePDU(f HandlerFunc) {
 		seq := p.Header().Seq
 		t.tx.Lock()
 		rc := t.tx.inflight[seq]
-		t.tx.Unlock()
 		if rc != nil {
 			rc <- &tx{PDU: p}
+			t.tx.Unlock()
 		} else if f != nil {
+			t.tx.Unlock()
 			f(p)
+		} else {
+			t.tx.Unlock()
 		}
 		if p.Header().ID == pdu.DeliverSMID { // Send DeliverSMResp
 			pResp := pdu.NewDeliverSMRespSeq(p.Header().Seq)
