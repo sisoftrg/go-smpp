@@ -178,11 +178,11 @@ func TestLongMessageAsUCS2(t *testing.T) {
 			smByts := p.Fields()[pdufield.ShortMessage].Bytes()
 			switch pdutext.DataCoding(p.Fields()[pdufield.DataCoding].Raw().(uint8)) {
 			case pdutext.Latin1Type:
-				receivedMsg = receivedMsg + string(pdutext.Latin1(smByts)[7:].Decode())
+				receivedMsg = receivedMsg + string(pdutext.Latin1(smByts).Decode())
 			case pdutext.UCS2Type:
-				receivedMsg = receivedMsg + string(pdutext.UCS2(smByts)[7:].Decode())
+				receivedMsg = receivedMsg + string(pdutext.UCS2(smByts).Decode())
 			default:
-				receivedMsg = receivedMsg + string(smByts[7:])
+				receivedMsg = receivedMsg + string(smByts)
 			}
 			c.Write(r)
 		default:
