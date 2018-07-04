@@ -53,7 +53,7 @@ type Transmitter struct {
 	tx struct {
 		count int32
 		sync.Mutex
-		inflight map[uint32]chan *tx
+		inflight map[string]chan *tx
 	}
 }
 
@@ -74,7 +74,7 @@ func (t *Transmitter) Bind() <-chan ConnStatus {
 		return t.cl.Status
 	}
 	t.tx.Lock()
-	t.tx.inflight = make(map[uint32]chan *tx)
+	t.tx.inflight = make(map[string]chan *tx)
 	t.tx.Unlock()
 	c := &client{
 		Addr:               t.Addr,
@@ -120,9 +120,9 @@ func (t *Transmitter) handlePDU(f HandlerFunc) {
 		if err != nil {
 			break
 		}
-		seq := p.Header().Seq
+		key := p.Header().Key()
 		t.tx.Lock()
-		rc := t.tx.inflight[seq]
+		rc := t.tx.inflight[key]
 		if rc != nil {
 			rc <- &tx{PDU: p}
 			t.tx.Unlock()
@@ -288,14 +288,14 @@ func (t *Transmitter) do(p pdu.Body) (*tx, error) {
 		}
 	}
 	rc := make(chan *tx, 1)
-	seq := p.Header().Seq
+	key := p.Header().Key()
 	t.tx.Lock()
-	t.tx.inflight[seq] = rc
+	t.tx.inflight[key] = rc
 	t.tx.Unlock()
 	defer func() {
 		close(rc)
 		t.tx.Lock()
-		delete(t.tx.inflight, seq)
+		delete(t.tx.inflight, key)
 		t.tx.Unlock()
 	}()
 	err := t.cl.Write(p)
