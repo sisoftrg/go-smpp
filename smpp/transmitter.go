@@ -293,7 +293,6 @@ func (t *Transmitter) do(p pdu.Body) (*tx, error) {
 	t.tx.inflight[key] = rc
 	t.tx.Unlock()
 	defer func() {
-		close(rc)
 		t.tx.Lock()
 		delete(t.tx.inflight, key)
 		t.tx.Unlock()
