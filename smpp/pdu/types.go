@@ -279,6 +279,46 @@ func NewSubmitMultiResp() Body {
 	return b
 }
 
+// CancelSM PDU.
+type CancelSM struct{ *codec }
+
+func newCancelSM(hdr *Header) *codec {
+	return &codec{
+		h: hdr,
+		l: pdufield.List{
+			pdufield.ServiceType,
+			pdufield.MessageID,
+			pdufield.SourceAddrTON,
+			pdufield.SourceAddrNPI,
+			pdufield.SourceAddr,
+			pdufield.DestAddrTON,
+			pdufield.DestAddrNPI,
+			pdufield.DestinationAddr,
+		},
+	}
+}
+
+// NewCancelSM creates and initializes a new CancelSM PDU.
+func NewCancelSM() Body {
+	b := newCancelSM(&Header{ID: CancelSMID})
+	b.init()
+	return b
+}
+
+// CancelSMResp PDU.
+type CancelSMResp struct{ *codec }
+
+func newCancelSMResp(hdr *Header) *codec {
+	return &codec{h: hdr}
+}
+
+// NewCancelSMResp creates and initializes a new CancelSMResp PDU.
+func NewCancelSMResp() Body {
+	b := newCancelSMResp(&Header{ID: CancelSMRespID})
+	b.init()
+	return b
+}
+
 // DeliverSM PDU.
 type DeliverSM struct{ *codec }
 

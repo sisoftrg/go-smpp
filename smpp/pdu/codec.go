@@ -157,9 +157,9 @@ func Decode(r io.Reader) (Body, error) {
 	case BindReceiverRespID, BindTransceiverRespID, BindTransmitterRespID:
 		return decodeFields(newBindResp(hdr), b)
 	case CancelSMID:
-		// TODO(fiorix): Implement CancelSM.
+		return decodeFields(newCancelSM(hdr), b)
 	case CancelSMRespID:
-		// TODO(fiorix): Implement CancelSMResp.
+		return decodeFields(newCancelSMResp(hdr), b)
 	case DataSMID:
 		// TODO(fiorix): Implement DataSM.
 	case DataSMRespID:
